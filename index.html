@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula EDUTEC · Presentación final ABP</title>
+<style>
+  :root{
+    --bg:#0b1020; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
+    --txt:#eef2ff; --muted:#a5b0d6;
+    --a:#7c5cff; --b:#22d3ee; --c:#34d399; --d:#fb7185; --e:#fbbf24;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+  body::before{content:"";position:fixed;inset:-20%;background:
+    radial-gradient(circle at 20% 20%,rgba(124,92,255,.35),transparent 40%),
+    radial-gradient(circle at 80% 30%,rgba(34,211,238,.25),transparent 40%),
+    radial-gradient(circle at 50% 90%,rgba(251,113,133,.18),transparent 45%);
+    filter:blur(40px);animation:drift 18s ease-in-out infinite alternate;z-index:0}
+  @keyframes drift{to{transform:translate(4%,-3%) scale(1.08)}}
+  .grid{position:fixed;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:60px 60px;opacity:.15;mask-image:radial-gradient(circle,#000,transparent 75%);z-index:0}
+
+  .deck{position:relative;z-index:1;height:100%;width:100%}
+  .slide{position:absolute;inset:0;padding:6vh 7vw;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transform:translateX(60px) scale(.98);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+  .slide.active{opacity:1;pointer-events:auto;transform:none}
+  .slide.prev{transform:translateX(-60px) scale(.98)}
+
+  .tag{display:inline-flex;align-items:center;gap:.5rem;font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;color:var(--b);font-weight:700;margin-bottom:1rem}
+  .tag b{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;letter-spacing:0}
+  h1{font-size:clamp(2.2rem,5vw,4.4rem);line-height:1.05;font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(1.8rem,3.6vw,3rem);line-height:1.1;font-weight:800;letter-spacing:-.01em;margin-bottom:1.2rem}
+  h3{font-size:1.15rem;font-weight:700;margin-bottom:.4rem}
+  p,li{color:var(--muted);font-size:clamp(.95rem,1.35vw,1.1rem);line-height:1.55}
+  .grad{background:linear-gradient(90deg,var(--a),var(--b),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.4rem 1.5rem;backdrop-filter:blur(14px);transition:transform .35s,border-color .35s,box-shadow .35s}
+  .card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.3);box-shadow:0 20px 60px -20px rgba(124,92,255,.5)}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .slide.active .reveal{opacity:1;transform:none}
+  .slide.active .reveal:nth-child(2){transition-delay:.1s}
+  .slide.active .reveal:nth-child(3){transition-delay:.2s}
+  .slide.active .reveal:nth-child(4){transition-delay:.3s}
+  .slide.active .reveal:nth-child(5){transition-delay:.4s}
+  .slide.active .reveal:nth-child(6){transition-delay:.5s}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+  .ico{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:1.5rem;margin-bottom:.9rem;color:#fff}
+  .pill{display:inline-block;padding:.25rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.05em;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--txt)}
+
+  .nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:999px;background:rgba(15,20,40,.6);border:1px solid var(--line);backdrop-filter:blur(12px)}
+  .nav button{width:42px;height:42px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-size:1.1rem;cursor:pointer;transition:transform .2s}
+  .nav button:hover{transform:scale(1.1)}
+  .dots{display:flex;gap:8px}
+  .dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .4s}
+  .dots i.on{width:28px;border-radius:9px;background:linear-gradient(90deg,var(--a),var(--b))}
+  .count{font-size:.8rem;color:var(--muted);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+  .bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--b),var(--c));width:0;transition:width .6s;z-index:5}
+
+  .orb{position:absolute;right:8vw;top:50%;transform:translateY(-50%);width:min(38vw,420px);aspect-ratio:1;animation:spin 30s linear infinite}
+  @keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+  .orb svg{width:100%;height:100%}
+  .float{animation:float 6s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-10px)}}
+
+  .flow{display:flex;align-items:center;gap:0;margin:1.5rem 0 1rem;flex-wrap:wrap}
+  .node{flex:1;min-width:180px;text-align:center;padding:1.2rem;border-radius:20px;background:var(--card);border:1px solid var(--line);position:relative}
+  .node .n{font-size:2rem;font-weight:800}
+  .arrow{width:60px;height:4px;background:linear-gradient(90deg,var(--a),var(--b));position:relative;overflow:hidden;border-radius:4px;flex:0 0 60px}
+  .arrow::after{content:"";position:absolute;top:0;left:-40%;width:40%;height:100%;background:#fff;animation:slide 1.6s linear infinite}
+  @keyframes slide{to{left:110%}}
+
+  .q{font-size:clamp(1.6rem,3.2vw,2.8rem);font-weight:700;line-height:1.3;padding:2rem 2.4rem;border-radius:28px;background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(34,211,238,.12));border:1px solid rgba(255,255,255,.18);position:relative}
+  .q::before{content:"“";position:absolute;top:-30px;left:20px;font-size:6rem;color:var(--b);opacity:.4;line-height:1}
+
+  .src{position:relative;overflow:hidden}
+  .src .num{position:absolute;right:14px;top:6px;font-size:3.5rem;font-weight:900;opacity:.07}
+  .discover{margin-top:1.3rem;padding:1.1rem 1.4rem;border-radius:18px;border-left:4px solid var(--e);background:rgba(251,191,36,.08)}
+
+  .alt{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:1rem;align-items:stretch}
+  .alt .card{display:flex;flex-direction:column}
+  .alt .card.sel{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 25px 70px -20px rgba(52,211,153,.5);background:linear-gradient(160deg,rgba(52,211,153,.14),var(--card))}
+  .meter{height:10px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden;margin:.6rem 0 1rem}
+  .meter span{display:block;height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--d),var(--e));transition:width 1.2s cubic-bezier(.2,.8,.2,1) .4s}
+  .slide.active .meter span{width:var(--w)}
+  .meter.good span{background:linear-gradient(90deg,var(--c),var(--b))}
+
+  .stack{display:flex;flex-direction:column;gap:.9rem}
+  .layer{display:flex;gap:1rem;align-items:center;padding:1rem 1.3rem;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+  .layer .ico{margin:0;flex:0 0 52px}
+  .sections{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.5rem}
+  .sections span{padding:.4rem .8rem;border-radius:10px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.35);color:#c9f6ff;font-size:.85rem;font-weight:600}
+  .tl{display:flex;gap:6px;margin-top:.7rem}
+  .tl div{border-radius:10px;padding:.5rem .6rem;font-size:.78rem;color:#fff;font-weight:700;background:linear-gradient(90deg,var(--a),var(--b));opacity:0;transform:scaleX(.6);transform-origin:left;transition:opacity .6s,transform .8s cubic-bezier(.2,.8,.2,1)}
+  .slide.active .tl div{opacity:1;transform:none}
+  .slide.active .tl div:nth-child(2){transition-delay:.3s}
+  .slide.active .tl div:nth-child(3){transition-delay:.6s}
+  .tl div small{display:block;font-weight:400;font-size:.7rem;color:#e0f7ff}
+
+  .radial{position:relative;width:min(44vw,460px);aspect-ratio:1;margin:auto}
+  .radial .core{position:absolute;inset:30%;border-radius:50%;display:grid;place-items:center;text-align:center;padding:1rem;background:radial-gradient(circle,rgba(124,92,255,.5),rgba(11,16,32,.9));border:1px solid var(--line);box-shadow:0 0 80px rgba(124,92,255,.5);font-weight:700;font-size:.95rem;color:#fff;animation:pulse 3s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 120px rgba(34,211,238,.6)}}
+  .radial .ring{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(255,255,255,.2);animation:spin 40s linear infinite reverse}
+  .radial .ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 70%,rgba(34,211,238,.6) 80%,transparent 90%);-webkit-mask:radial-gradient(circle,transparent 98%,#000 100%);mask:radial-gradient(circle,transparent 98%,#000 100%)}
+  .node-r{position:absolute;width:160px;transform:translate(-50%,-50%);padding:.8rem;border-radius:16px;background:rgba(15,20,40,.85);border:1px solid var(--line);font-size:.82rem;color:var(--muted);text-align:left;transition:transform .3s}
+  .node-r:hover{transform:translate(-50%,-50%) scale(1.06)}
+  .node-r b{display:block;color:#fff;font-size:.95rem;margin-bottom:.2rem}
+  .eval-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3vw;align-items:center}
+
+  .team{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+  .step{display:flex;align-items:center;gap:.8rem;margin-top:1.3rem;flex-wrap:wrap}
+  .step .s{padding:.7rem 1rem;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:.9rem;color:#fff;font-weight:600}
+  .step .s small{display:block;color:var(--muted);font-weight:400;font-size:.75rem}
+
+  .closing{text-align:center;align-items:center}
+  .closing p{max-width:900px;margin:0 auto}
+  .big{font-size:clamp(1.9rem,4vw,3.4rem);font-weight:800;line-height:1.15;max-width:1000px;margin:0 auto 1.4rem}
+
+  .hero-text{max-width:60%}
+
+  /* Pantallas grandes (≥1600px) */
+  @media (min-width:1600px){
+    .slide{padding:6vh 10vw}
+    h1{font-size:5.2rem}
+    p,li{font-size:1.2rem}
+  }
+
+  /* Tablets horizontales (≤1024px) */
+  @media (max-width:1024px){
+    .grid4{grid-template-columns:repeat(2,1fr)}
+    .slide{padding:6vh 5vw}
+    .orb{width:min(34vw,300px);right:3vw;opacity:.35}
+    .hero-text{max-width:78%}
+    .radial{width:min(46vw,380px)}
+    .node-r{width:140px;font-size:.76rem}
+  }
+
+  /* Tablets verticales y celulares grandes (≤900px) */
+  @media (max-width:900px){
+    .grid3,.grid4,.team,.alt,.eval-wrap,.grid2{grid-template-columns:1fr}
+    .orb{opacity:.12}
+    .hero-text{max-width:100%}
+    .arrow{display:none}
+    .flow{flex-direction:column;gap:.6rem}
+    .node{min-width:0;width:100%}
+    .tl{flex-direction:column}
+    .slide{overflow-y:auto;justify-content:flex-start;padding:9vh 6vw 120px}
+    .radial{width:min(80vw,380px)}
+  }
+
+  /* Celulares (≤600px) */
+  @media (max-width:600px){
+    .orb,.radial{display:none}
+    .slide{padding:8vh 5vw 120px}
+    h1{font-size:2.2rem}
+    h2{font-size:1.7rem;margin-bottom:.9rem}
+    .tag{font-size:.7rem;letter-spacing:.12em;margin-bottom:.6rem}
+    .tag b{width:28px;height:28px}
+    .q{font-size:1.3rem;padding:1.4rem 1.2rem}
+    .q::before{font-size:4rem;top:-20px;left:10px}
+    .card{padding:1rem 1.1rem;border-radius:16px}
+    .layer{flex-direction:column;align-items:flex-start;padding:.9rem}
+    .step{flex-direction:column;align-items:stretch}
+    .step .s{width:100%}
+    .sections span{font-size:.78rem}
+    .discover{padding:.9rem 1rem}
+    .big{font-size:1.7rem}
+    .nav{bottom:12px;padding:8px 10px;gap:8px;max-width:calc(100vw - 24px)}
+    .nav button{width:38px;height:38px}
+    .dots{gap:5px}
+    .dots i{width:7px;height:7px}
+    .dots i.on{width:20px}
+  }
+
+  /* Celulares en horizontal y pantallas bajas */
+  @media (max-height:520px) and (orientation:landscape){
+    .slide{overflow-y:auto;justify-content:flex-start;padding:4vh 5vw 90px}
+    h1{font-size:2rem}
+    h2{font-size:1.5rem;margin-bottom:.6rem}
+    .orb{display:none}
+    .radial{width:260px}
+    .node-r{width:120px;font-size:.7rem}
+  }
+  @media (max-height:760px) and (min-width:901px){
+    .slide{overflow-y:auto}
+  }
+
+  /* Dispositivos táctiles: sin efectos de hover que se queden pegados */
+  @media (hover:none){
+    .card:hover{transform:none;box-shadow:none}
+    .node-r:hover{transform:translate(-50%,-50%)}
+  }
+
+  /* Accesibilidad: reducir animaciones si el sistema lo pide */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<div class="bar" id="bar"></div>
+
+<div class="deck" id="deck">
+
+  <!-- 0. PORTADA -->
+  <section class="slide active">
+    <div class="orb float" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="180" fill="none" stroke="url(#g1)" stroke-width="2" stroke-dasharray="4 10"/>
+        <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="80" fill="url(#g1)" opacity=".25"/>
+        <circle cx="200" cy="20" r="12" fill="#22d3ee"/>
+        <circle cx="380" cy="200" r="9" fill="#34d399"/>
+        <circle cx="200" cy="330" r="11" fill="#fb7185"/>
+        <circle cx="50" cy="150" r="8" fill="#fbbf24"/>
+        <text x="200" y="210" text-anchor="middle" fill="#fff" font-size="34" font-weight="800">EDUTEC</text>
+      </svg>
+    </div>
+    <div class="hero-text">
+      <div class="tag reveal"><b>ETP</b> Presentación final del proyecto ABP · Mendoza</div>
+      <h1 class="reveal">Continuidad pedagógica <span class="grad">sin aulas vacías</span></h1>
+      <p class="reveal" style="margin-top:1.4rem;font-size:1.2rem">Microcapacitaciones de 20 minutos para el Aula EDUTEC (Moodle), pensadas para responder a las contingencias climáticas en la ETP.</p>
+      <div class="reveal" style="margin-top:1.8rem;display:flex;gap:.6rem;flex-wrap:wrap"><span class="pill">Aprendizaje Basado en Proyectos</span><span class="pill">Práctica II</span><span class="pill">Co-enseñanza</span></div>
+    </div>
+  </section>
+
+  <!-- 1. PROBLEMA -->
+  <section class="slide">
+    <div class="tag reveal"><b>01</b> El problema</div>
+    <h2 class="reveal">¿Qué situación <span class="grad">decidimos abordar?</span></h2>
+    <p class="reveal" style="max-width:820px">Viento Zonda y temporales interrumpen las clases presenciales en la ETP. Frente a ello, el EVEA (Moodle / Aula EDUTEC) aparece como recurso, pero su apropiación docente es desigual.</p>
+    <div class="flow reveal">
+      <div class="node"><div class="n">🏫</div><h3>Clase presencial</h3><p>Planificación habitual</p></div>
+      <div class="arrow"></div>
+      <div class="node" style="border-color:rgba(251,113,133,.5)"><div class="n">🌬️</div><h3>Contingencia</h3><p>Viento Zonda / temporal</p></div>
+      <div class="arrow"></div>
+      <div class="node"><div class="n">⚡</div><h3>Respuesta de emergencia</h3><p>Improvisada, sin criterio común</p></div>
+    </div>
+    <div class="grid3" style="margin-top:1.2rem">
+      <div class="card reveal"><h3>Uso acrítico de IA</h3><p>Materiales con errores conceptuales sin revisión.</p></div>
+      <div class="card reveal"><h3>Saturación y descontextualización</h3><p>Actividades que no se ajustan al grupo ni al taller.</p></div>
+      <div class="card reveal"><h3>Falta de criterio institucional</h3><p>Escaso vínculo entre el entorno virtual, el Perfil Profesional y el taller o laboratorio.</p></div>
+    </div>
+    <p class="reveal" style="margin-top:1.2rem;color:#fff"><b>Desafío:</b> transformar la respuesta de emergencia en una práctica pedagógica planificada y situada.</p>
+  </section>
+
+  <!-- 2. PREGUNTA GUÍA -->
+  <section class="slide">
+    <div class="tag reveal"><b>02</b> La pregunta guía</div>
+    <div class="q reveal" style="margin:1rem 0 2rem">¿Cómo podríamos involucrar las tecnologías y los entornos virtuales (Aula EDUTEC) en las prácticas pedagógicas de la ETP de forma <span class="grad">responsable, situada y transversal</span> frente a contingencias climáticas no presenciales?</div>
+    <div class="grid4">
+      <div class="card reveal"><div class="ico" style="background:var(--a)">🌎</div><h3>Parte de la realidad</h3><p>Una problemática real de la provincia.</p></div>
+      <div class="card reveal"><div class="ico" style="background:var(--b)">📚</div><h3>Demanda indagar</h3><p>Guió el análisis normativo y pedagógico.</p></div>
+      <div class="card reveal"><div class="ico" style="background:var(--e)">⚖️</div><h3>Impulsa decisiones</h3><p>Analizar el contexto sociotécnico de la escuela.</p></div>
+      <div class="card reveal"><div class="ico" style="background:var(--c)">🛠️</div><h3>Lleva a una solución</h3><p>Una intervención formativa concreta y viable.</p></div>
+    </div>
+  </section>
+
+  <!-- 3. INVESTIGACIÓN -->
+  <section class="slide">
+    <div class="tag reveal"><b>03</b> La investigación</div>
+    <h2 class="reveal">¿Qué descubrimos? <span class="grad">Fuentes oficiales que resignificaron el problema</span></h2>
+    <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <div class="card src reveal"><span class="num">01</span><h3>Res. DGE 6231/2026</h3><p>Continuidad pedagógica no presencial: propósito pedagógico claro, conectividad, evitar sobrecargas y evaluación formativa de acompañamiento.</p></div>
+      <div class="card src reveal"><span class="num">02</span><h3>DCP Mendoza · Capacidades</h3><p>La tecnología es un vehículo para resolución de problemas, pensamiento crítico, aprender a aprender y compromiso, no un adiestramiento instrumental.</p></div>
+      <div class="card src reveal"><span class="num">03</span><h3>DCP · Ciudadanía digital</h3><p>Ética digital, privacidad, convivencia en entornos virtuales y huella digital.</p></div>
+      <div class="card src reveal"><span class="num">04</span><h3>Ley 9.611 · Res. 201/18</h3><p>Regulación pedagógica acordada en Acuerdos Institucionales de Convivencia (AIC), no sanciones ni prohibiciones.</p></div>
+      <div class="card src reveal"><span class="num">05</span><h3>Guía de convivencia digital</h3><p>Protocolos y circuitos institucionales para prevenir y actuar ante conflictos en entornos virtuales.</p></div>
+    </div>
+    <div class="discover reveal"><b style="color:var(--e)">Conclusión del diagnóstico:</b> <span style="color:#fff">hay regulaciones y plataformas disponibles, pero prevalece el desconocimiento docente del potencial transversal de la plataforma, y el tiempo institucional para capacitarse es escaso: se necesitan formatos ágiles y directos.</span></div>
+  </section>
+
+  <!-- 4. DECISIONES -->
+  <section class="slide">
+    <div class="tag reveal"><b>04</b> Las decisiones</div>
+    <h2 class="reveal">Tres alternativas, <span class="grad">una elegida</span></h2>
+    <div class="alt">
+      <div class="card reveal">
+        <span class="pill" style="color:var(--d)">Descartada</span>
+        <h3 style="margin-top:.8rem">Cursos asincrónicos o PDF</h3>
+        <p>Instructivos largos y manuales.</p>
+        <div class="meter"><span style="--w:30%"></span></div>
+        <p><b style="color:#fff">Motivo:</b> suelen no leerse por sobrecarga laboral y no resuelven dudas prácticas en tiempo real.</p>
+      </div>
+      <div class="card reveal">
+        <span class="pill" style="color:var(--d)">Descartada</span>
+        <h3 style="margin-top:.8rem">Jornadas extensas fuera de horario</h3>
+        <p>Capacitaciones largas y dispersas.</p>
+        <div class="meter"><span style="--w:45%"></span></div>
+        <p><b style="color:#fff">Motivo:</b> difícil convocar a docentes de distintas áreas técnicas y baja participación horaria en la ETP.</p>
+      </div>
+      <div class="card sel reveal">
+        <span class="pill" style="color:var(--c);border-color:var(--c)">✓ Seleccionada</span>
+        <h3 style="margin-top:.8rem;font-size:1.3rem">Microcapacitaciones presenciales de 20 minutos entre pares</h3>
+        <p style="margin-top:.4rem">"Cápsulas vivas" e interactivas, dentro de los tiempos escolares reales (reuniones de departamento, jornadas o pausas pedagógicas).</p>
+        <ul style="margin-top:.8rem;padding-left:1.1rem">
+          <li>Aprender haciendo: el docente resuelve un problema técnico-pedagógico puntual</li>
+          <li>Se realiza antes de la próxima eventualidad climática</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. PRODUCTO -->
+  <section class="slide">
+    <div class="tag reveal"><b>05</b> El producto</div>
+    <h2 class="reveal">Ciclo de Microcapacitaciones <span class="grad">"Aula EDUTEC al Instante"</span></h2>
+    <div class="stack">
+      <div class="layer reveal">
+        <div class="ico" style="background:linear-gradient(135deg,var(--a),var(--b))">⏱️</div>
+        <div style="flex:1">
+          <h3>Estructura de cada cápsula de 20 minutos</h3>
+          <div class="tl">
+            <div style="flex:1">0–5 min<small>Activación: caso simulado (Zonda al día siguiente)</small></div>
+            <div style="flex:2;background:linear-gradient(90deg,var(--b),var(--c))">5–15 min<small>Manos a la masa: Módulos 1 a 3</small></div>
+            <div style="flex:1;background:linear-gradient(90deg,var(--c),var(--e))">15–20 min<small>Cierre y caja de herramientas</small></div>
+          </div>
+          <div class="sections">
+            <span>M1 · Ingresar al sistema</span><span>M2 · Matricular estudiantes</span><span>M3 · Cargar una actividad</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer reveal">
+        <div class="ico" style="background:linear-gradient(135deg,var(--c),var(--b))">🧰</div>
+        <div>
+          <h3>Caja de herramientas</h3>
+          <p>Puesta en común del resultado inmediato, ficha resumen visual plastificada de 1 página (chuleta didáctica) y enlace al aula modelo en EDUTEC para replicar.</p>
+        </div>
+      </div>
+      <div class="layer reveal">
+        <div class="ico" style="background:linear-gradient(135deg,var(--e),var(--d))">📦</div>
+        <div>
+          <h3>Kit de soporte</h3>
+          <p>Secuencias didácticas modelo listas para importar en Moodle y una lista de verificación en 3 pasos: ¿mi actividad para viento Zonda es accesible, no satura y vincula capacidades técnicas?</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. EVALUACIÓN -->
+  <section class="slide">
+    <div class="tag reveal"><b>06</b> La evaluación</div>
+    <h2 class="reveal">¿Cómo sabremos si <span class="grad">resuelve el problema?</span></h2>
+    <div class="eval-wrap">
+      <div class="radial reveal">
+        <div class="ring"></div>
+        <div class="core">Continuidad pedagógica real</div>
+        <div class="node-r" style="left:50%;top:0"><b>⚡ Desempeño inmediato</b>100% configura o publica en el espacio de prueba.</div>
+        <div class="node-r" style="left:100%;top:50%"><b>📈 Monitoreo</b>Aulas activas el primer día de suspensión por Zonda.</div>
+        <div class="node-r" style="left:50%;top:100%"><b>🔍 Calidad</b>Consignas con enfoque de capacidades y sin errores de IA.</div>
+        <div class="node-r" style="left:0;top:50%"><b>📱 Autopercepción</b>Encuesta QR de 2 preguntas al cerrar.</div>
+      </div>
+      <div class="stack">
+        <div class="card reveal"><h3>Evidencia de desempeño inmediato</h3><p>Comprobación en vivo, dentro de los 20 minutos, de que cada docente logró configurar o publicar su actividad.</p></div>
+        <div class="card reveal"><h3>Monitoreo en contingencias reales</h3><p>Registro de actividad en EDUTEC durante el primer día de suspensión por viento Zonda posterior a la capacitación.</p></div>
+        <div class="card reveal"><h3>Calidad de las producciones</h3><p>Revisión muestral: enfoque de capacidades, sin errores de IA no revisados y respeto por la baja conectividad.</p></div>
+        <div class="card reveal"><h3>Sondeo de autopercepción</h3><p>Claridad del taller y confianza adquirida para usar la plataforma sin temor.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. EQUIPO -->
+  <section class="slide">
+    <div class="tag reveal"><b>07</b> El equipo pedagógico</div>
+    <h2 class="reveal">Roles, decisiones y <span class="grad">aprendizajes</span></h2>
+    <div class="team">
+      <div class="card reveal"><div class="ico" style="background:var(--a)">🔎</div><h3>Análisis normativo</h3><p>DGE, leyes y resoluciones provinciales.</p></div>
+      <div class="card reveal"><div class="ico" style="background:var(--b)">🧭</div><h3>Diseño técnico-pedagógico</h3><p>Secuencias en Moodle / EDUTEC.</p></div>
+      <div class="card reveal"><div class="ico" style="background:var(--c)">⏱️</div><h3>Dinámica de 20 minutos</h3><p>Tiempos estrictos y recursos gráficos interactivos.</p></div>
+    </div>
+    <div class="grid2" style="margin-top:1.2rem">
+      <div class="card reveal"><h3>🗣️ Toma de decisiones</h3><p>Todas las definiciones se resolvieron por debate pedagógico. El cansancio docente y la urgencia ante los avisos de Zonda llevaron a condensar el curso tradicional en microtalleres de alto impacto.</p></div>
+      <div class="card reveal"><h3>🌱 Aprendizajes</h3><p>Capacitar a colegas no es dar una clase magistral, sino crear espacios accesibles donde experimentar y construir soluciones para la labor cotidiana en la escuela técnica.</p></div>
+    </div>
+    <div class="step reveal">
+      <div class="s">Análisis normativo<small>investigación</small></div>→
+      <div class="s">Debate pedagógico<small>deliberación</small></div>→
+      <div class="s">Microtaller de 20 min<small>decisión colectiva</small></div>→
+      <div class="s">Kit y aula modelo<small>producto</small></div>
+    </div>
+  </section>
+
+  <!-- 8. CIERRE -->
+  <section class="slide closing">
+    <div class="tag reveal" style="justify-content:center"><b>✦</b> Mensaje final</div>
+    <div class="big reveal">La integración tecnológica exige co-enseñanza: <span class="grad">se construye en colectivo.</span></div>
+    <p class="reveal">Continuidad pedagógica con sentido, sin sobrecargar ni excluir a nuestra comunidad educativa.</p>
+    <div class="grid3 reveal" style="margin-top:2.4rem;max-width:900px;margin-left:auto;margin-right:auto">
+      <div class="card"><h3>Microcapacitación</h3><p>20 minutos, aprender haciendo</p></div>
+      <div class="card"><h3>Aula Modelo</h3><p>Referencia para replicar en EDUTEC</p></div>
+      <div class="card"><h3>Kit de soporte</h3><p>Secuencias y lista de verificación</p></div>
+    </div>
+    <p class="reveal" style="margin-top:2.4rem;font-size:.95rem">¡Gracias! · Preguntas y comentarios</p>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Anterior">←</button>
+  <div class="dots" id="dots"></div>
+  <div class="count" id="count">1 / 9</div>
+  <button id="next" aria-label="Siguiente">→</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsEl=document.getElementById('dots');
+  const countEl=document.getElementById('count');
+  const bar=document.getElementById('bar');
+  let cur=0;
+  slides.forEach((_,i)=>{const d=document.createElement('i');d.onclick=()=>go(i);dotsEl.appendChild(d);});
+  function go(n){
+    if(n<0||n>=slides.length)return;
+    slides.forEach((s,i)=>{
+      s.classList.remove('active','prev');
+      if(i<n)s.classList.add('prev');
+    });
+    slides[cur=n].classList.add('active');
+    [...dotsEl.children].forEach((d,i)=>d.classList.toggle('on',i===n));
+    countEl.textContent=(n+1)+' / '+slides.length;
+    bar.style.width=((n+1)/slides.length*100)+'%';
+    history.replaceState(null,'','#'+(n+1));
+  }
+  document.getElementById('prev').onclick=()=>go(cur-1);
+  document.getElementById('next').onclick=()=>go(cur+1);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1);}
+    if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1);}
+    if(e.key==='Home')go(0);
+    if(e.key==='End')go(slides.length-1);
+  });
+  let tx=null;
+  document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+  document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1));tx=null;});
+  const h=parseInt(location.hash.slice(1));
+  go(h>=1&&h<=slides.length?h-1:0);
+</script>
+</body>
+</html>
