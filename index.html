@@ -8,22 +8,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<!-- Iconos Profesionales: Phosphor Icons -->
-<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Iconos Dinámicos: Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
   :root {
-    /* Paleta Sunset Neon y Fondos Midnight */
-    --bg: #09090b; 
-    --card: rgba(255, 255, 255, 0.03); 
+    /* Paleta Cyber Aurora */
+    --bg: #030014; /* Fondo ultra oscuro */
+    --card: rgba(255, 255, 255, 0.04); 
     --line: rgba(255, 255, 255, 0.08);
     --txt: #f8fafc; 
     --muted: #94a3b8;
     --a: #ec4899; /* Rosa Vibrante */
-    --b: #f97316; /* Naranja Mango */
-    --c: #10b981; /* Verde Menta */
-    --d: #8b5cf6; /* Púrpura */
-    --e: #facc15; /* Amarillo Eléctrico */
+    --b: #8b5cf6; /* Púrpura Eléctrico */
+    --c: #06b6d4; /* Cyan Neón */
+    --d: #f97316; /* Naranja */
+    --e: #10b981; /* Esmeralda */
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,153 +36,141 @@
     overflow-x: hidden;
   }
 
-  /* Fondo animado sutil */
-  body::before {
-    content: ""; position: fixed; inset: -20%; background:
-    radial-gradient(circle at 20% 20%, rgba(236,72,153,.15), transparent 40%),
-    radial-gradient(circle at 80% 30%, rgba(249,115,22,.12), transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(139,92,246,.15), transparent 45%);
-    filter: blur(60px); animation: drift 20s ease-in-out infinite alternate; z-index: 0;
-    pointer-events: none;
+  /* --- FONDO ANIMADO AURORA MESH --- */
+  .aurora-bg {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
   }
-  @keyframes drift { to { transform: translate(3%, -2%) scale(1.05); } }
+  .aurora-blob {
+    position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4;
+    animation: blobFloat 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(236, 72, 153, 0.4); }
+  .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: rgba(139, 92, 246, 0.3); animation-delay: -5s; }
+  .blob-3 { top: 30%; left: 30%; width: 45vw; height: 45vw; background: rgba(6, 182, 212, 0.2); animation-delay: -10s; }
   
-  /* Grilla de fondo */
+  @keyframes blobFloat {
+    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+    100% { transform: translate(15vw, 15vh) scale(1.3) rotate(20deg); }
+  }
+
+  /* Grilla de textura sobre el fondo */
   .grid-bg {
     position: fixed; inset: 0; 
     background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 60px 60px; opacity: 0.15; 
-    mask-image: radial-gradient(circle at 50% 50%, #000, transparent 80%); 
-    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000, transparent 80%);
+    background-size: 50px 50px; opacity: 0.15; 
+    mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); 
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
     z-index: 0; pointer-events: none;
   }
 
-  /* Halo de luz del cursor */
-  .glow-pointer {
-    position: fixed; top: 0; left: 0; width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(249,115,22,0.15), transparent 60%);
-    border-radius: 50%; pointer-events: none; z-index: 1;
-    transform: translate(-50%, -50%); transition: opacity 0.3s;
-    opacity: 0;
-  }
-
-  /* Contenedor principal de secciones */
-  .deck { position: relative; z-index: 5; width: 100%; max-width: 1400px; margin: 0 auto; }
+  /* Contenedor principal */
+  .deck { position: relative; z-index: 5; width: 100%; max-width: 1400px; margin: 0 auto; perspective: 1000px; }
   
-  /* Secciones individuales (antes diapositivas) */
+  /* Secciones */
   .section {
-    min-height: 100vh;
-    padding: 12vh 7vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: relative;
-    border-bottom: 1px solid var(--line);
+    min-height: 100vh; padding: 12vh 7vw; display: flex; flex-direction: column; justify-content: center; position: relative; border-bottom: 1px solid rgba(255,255,255,0.03);
   }
   .section:last-child { border-bottom: none; }
 
-  /* Animaciones Reveal al hacer scroll */
-  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: transform, opacity; }
-  .section.visible .reveal { opacity: 1; transform: none; }
+  /* Animación Reveal en 3D al hacer scroll */
+  .reveal { 
+    opacity: 0; 
+    transform: translateY(60px) scale(0.95) rotateX(-10deg); 
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); 
+    transform-origin: top center;
+    will-change: transform, opacity; 
+  }
+  .section.visible .reveal { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); }
   .section.visible .reveal:nth-child(2) { transition-delay: 0.1s; }
   .section.visible .reveal:nth-child(3) { transition-delay: 0.2s; }
   .section.visible .reveal:nth-child(4) { transition-delay: 0.3s; }
   .section.visible .reveal:nth-child(5) { transition-delay: 0.4s; }
-  .section.visible .reveal:nth-child(6) { transition-delay: 0.5s; }
 
-  /* Tipografía y Etiquetas */
-  .tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--b); font-weight: 800; margin-bottom: 1.2rem; }
-  .tag b { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--a), var(--b)); color: #fff; letter-spacing: 0; }
-  h1 { font-size: clamp(2.5rem, 5vw, 4.8rem); line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; }
+  /* Tipografía */
+  .tag { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c); font-weight: 800; margin-bottom: 1.2rem; }
+  .tag b { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--c), var(--b)); color: #fff; letter-spacing: 0; box-shadow: 0 0 15px rgba(6,182,212,0.4); }
+  h1 { font-size: clamp(2.5rem, 5vw, 4.8rem); line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   h2 { font-size: clamp(2rem, 3.6vw, 3.2rem); line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
-  h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
   p, li { color: var(--muted); font-size: clamp(1rem, 1.35vw, 1.15rem); line-height: 1.6; }
-  .grad { background: linear-gradient(90deg, var(--a), var(--b), var(--e)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad { background: linear-gradient(90deg, var(--c), var(--a), var(--d)); -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradientShift 6s ease infinite alternate; background-size: 200% 200%; }
   
-  /* Tarjetas Glassmorphism */
+  @keyframes gradientShift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+  /* Tarjetas interactivas preparadas para JS 3D Tilt */
   .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 1.6rem;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 20px rgba(0,0,0,0.2);
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 1.8rem;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.3);
+    /* La transición la manejará JS en hover, aquí es para cuando el ratón sale */
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s, border-color 0.5s;
+    transform-style: preserve-3d;
   }
-  @media (hover: hover) {
-    .card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 20px 40px -10px rgba(236, 72, 153, 0.15); }
+  .card::before {
+    content: ""; position: absolute; inset: 0; border-radius: 24px; background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%); opacity: 0; transition: opacity 0.5s; pointer-events: none;
   }
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-color: rgba(255,255,255,0.25); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 30px 60px -15px rgba(139,92,246,0.2); z-index: 10; }
+
+  /* Contenido interno de la tarjeta para efecto parallax */
+  .card > * { transform: translateZ(20px); }
 
   /* Grillas */
-  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
   .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
   
-  .ico { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; font-size: 1.8rem; margin-bottom: 1rem; color: #fff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
-  .pill { display: inline-block; padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--txt); }
+  .ico { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; margin-bottom: 1.2rem; color: #fff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 10px 20px rgba(0,0,0,0.2); }
+  .ico i { width: 28px; height: 28px; }
+  
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: var(--txt); backdrop-filter: blur(10px); }
 
-  /* Barra de progreso de scroll top */
+  /* Barra de progreso de lectura */
   .bar-bg { position: fixed; top: 0; left: 0; height: 4px; width: 100%; background: rgba(255,255,255,0.05); z-index: 50; }
-  .bar { height: 100%; background: linear-gradient(90deg, var(--a), var(--b), var(--c)); width: 0%; transition: width 0.1s; }
+  .bar { height: 100%; background: linear-gradient(90deg, var(--c), var(--a), var(--b)); width: 0%; transition: width 0.1s; box-shadow: 0 0 10px var(--a); }
 
-  /* Elementos específicos */
-  .orb { position: absolute; right: 8vw; top: 50%; transform: translateY(-50%); width: min(38vw, 420px); aspect-ratio: 1; animation: spin 40s linear infinite; pointer-events: none; }
-  @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
-  .orb svg { width: 100%; height: 100%; filter: drop-shadow(0 0 30px rgba(236,72,153,0.3)); }
-  .float { animation: float 6s ease-in-out infinite; }
-  @keyframes float { 50% { transform: translateY(-15px); } }
+  /* Orbe de portada dinámico */
+  .orb { position: absolute; right: 5vw; top: 50%; transform: translateY(-50%); width: min(42vw, 480px); aspect-ratio: 1; pointer-events: none; }
+  .orb-core { position: absolute; inset: 20%; background: radial-gradient(circle, var(--a), var(--b)); border-radius: 50%; filter: blur(40px); opacity: 0.6; animation: pulseCore 4s ease-in-out infinite alternate; }
+  .orb-ring { position: absolute; inset: 0; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; animation: spinRing 30s linear infinite; }
+  .orb-ring-2 { position: absolute; inset: -10%; border: 1px solid rgba(6,182,212,0.3); border-radius: 50%; animation: spinRing 40s linear infinite reverse; }
+  @keyframes spinRing { to { transform: rotate(360deg); } }
+  @keyframes pulseCore { 0% { transform: scale(0.9); opacity: 0.4; } 100% { transform: scale(1.1); opacity: 0.7; } }
 
-  .flow { display: flex; align-items: center; gap: 0; margin: 1.5rem 0 1.5rem; flex-wrap: wrap; }
-  .node { flex: 1; min-width: 180px; text-align: center; padding: 1.4rem; border-radius: 20px; background: var(--card); border: 1px solid var(--line); position: relative; }
-  .node .n { font-size: 2.2rem; color: var(--txt); margin-bottom: 0.5rem; }
-  .arrow { width: 60px; height: 4px; background: linear-gradient(90deg, var(--a), var(--b)); position: relative; overflow: hidden; border-radius: 4px; flex: 0 0 60px; }
-  .arrow::after { content: ""; position: absolute; top: 0; left: -40%; width: 40%; height: 100%; background: #fff; animation: slide 1.6s linear infinite; }
+  /* Diagramas y Flujos */
+  .flow { display: flex; align-items: center; gap: 0; margin: 2rem 0; flex-wrap: wrap; }
+  .node { flex: 1; min-width: 180px; text-align: center; padding: 1.8rem 1.4rem; border-radius: 20px; background: linear-gradient(180deg, var(--card), rgba(0,0,0,0.2)); border: 1px solid var(--line); position: relative; }
+  .node .n { color: var(--c); margin-bottom: 0.8rem; display: inline-block; padding: 1rem; border-radius: 50%; background: rgba(6,182,212,0.1); }
+  .arrow { width: 60px; height: 4px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; border-radius: 4px; flex: 0 0 60px; }
+  .arrow::after { content: ""; position: absolute; top: 0; left: -40%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, var(--c), transparent); animation: slide 1.5s linear infinite; }
   @keyframes slide { to { left: 110%; } }
 
-  .q { font-size: clamp(1.6rem, 3.2vw, 2.6rem); font-weight: 700; line-height: 1.35; padding: 2.5rem; border-radius: 28px; background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(249,115,22,0.05)); border: 1px solid rgba(236,72,153,0.2); position: relative; }
-  .q::before { content: "“"; position: absolute; top: -10px; left: 20px; font-size: 6rem; color: var(--a); opacity: 0.3; line-height: 1; font-family: serif; }
+  .q { font-size: clamp(1.6rem, 3.2vw, 2.6rem); font-weight: 700; line-height: 1.4; padding: 3rem; border-radius: 28px; background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(139,92,246,0.05)); border: 1px solid rgba(236,72,153,0.3); position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+  .q::before { content: "“"; position: absolute; top: -15px; left: 20px; font-size: 7rem; color: var(--a); opacity: 0.4; line-height: 1; font-family: serif; text-shadow: 0 0 20px var(--a); }
 
   .src { position: relative; overflow: hidden; }
-  .src .num { position: absolute; right: 14px; top: -10px; font-size: 4rem; font-weight: 900; opacity: 0.04; color: #fff; }
-  .discover { margin-top: 1.5rem; padding: 1.2rem 1.6rem; border-radius: 18px; border-left: 4px solid var(--e); background: rgba(250,204,21,0.08); }
+  .src .num { position: absolute; right: 10px; top: -15px; font-size: 5rem; font-weight: 900; opacity: 0.03; color: #fff; }
+  .discover { margin-top: 1.5rem; padding: 1.2rem 1.6rem; border-radius: 18px; border-left: 4px solid var(--c); background: rgba(6,182,212,0.1); }
 
   .alt { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 1.2rem; align-items: stretch; }
   .alt .card { display: flex; flex-direction: column; justify-content: space-between; }
-  .alt .card.sel { border-color: var(--c); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px var(--c), 0 20px 50px -15px rgba(16,185,129,0.3); background: linear-gradient(160deg, rgba(16,185,129,0.08), var(--card)); }
-  .meter { height: 8px; border-radius: 10px; background: rgba(255,255,255,0.08); overflow: hidden; margin: 1rem 0; }
-  .meter span { display: block; height: 100%; width: 0; border-radius: 10px; background: linear-gradient(90deg, var(--a), var(--b)); transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s; }
+  .alt .card.sel { border-color: var(--e); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px var(--e), 0 20px 50px -15px rgba(16,185,129,0.3); background: linear-gradient(160deg, rgba(16,185,129,0.1), var(--card)); }
+  .meter { height: 8px; border-radius: 10px; background: rgba(255,255,255,0.1); overflow: hidden; margin: 1rem 0; }
+  .meter span { display: block; height: 100%; width: 0; border-radius: 10px; background: linear-gradient(90deg, var(--muted), #fff); transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s; }
   .section.visible .meter span { width: var(--w); }
-  .meter.good span { background: linear-gradient(90deg, var(--c), var(--b)); }
+  .meter.good span { background: linear-gradient(90deg, var(--c), var(--e)); box-shadow: 0 0 10px var(--e); }
 
-  .stack { display: flex; flex-direction: column; gap: 1rem; }
-  .layer { display: flex; gap: 1.2rem; align-items: center; padding: 1.2rem 1.5rem; border-radius: 20px; background: var(--card); border: 1px solid var(--line); }
-  .layer .ico { margin: 0; flex: 0 0 56px; }
-  .sections { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.8rem; }
-  .sections span { padding: 0.4rem 0.8rem; border-radius: 10px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); color: #ffedd5; font-size: 0.85rem; font-weight: 700; }
-  .tl { display: flex; gap: 8px; margin-top: 0.8rem; }
-  .tl div { border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.8rem; color: #fff; font-weight: 800; background: linear-gradient(90deg, var(--a), var(--b)); opacity: 0; transform: scaleX(0.6); transform-origin: left; transition: opacity 0.6s, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .stack { display: flex; flex-direction: column; gap: 1.2rem; }
+  .layer { display: flex; gap: 1.5rem; align-items: center; padding: 1.5rem; border-radius: 20px; background: var(--card); border: 1px solid var(--line); }
+  .layer .ico { margin: 0; flex: 0 0 60px; height: 60px; font-size: 1.8rem; }
+  .sections { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+  .sections span { padding: 0.5rem 0.9rem; border-radius: 10px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.4); color: #ddd6fe; font-size: 0.85rem; font-weight: 700; }
+  .tl { display: flex; gap: 8px; margin-top: 1rem; }
+  .tl div { border-radius: 10px; padding: 0.8rem; font-size: 0.85rem; color: #fff; font-weight: 800; background: linear-gradient(90deg, var(--b), var(--a)); opacity: 0; transform: scaleX(0.6); transform-origin: left; transition: opacity 0.6s, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .section.visible .tl div { opacity: 1; transform: none; }
-  .section.visible .tl div:nth-child(2) { transition-delay: 0.3s; }
-  .section.visible .tl div:nth-child(3) { transition-delay: 0.6s; }
-  .tl div small { display: block; font-weight: 600; font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 2px; }
-
-  .radial { position: relative; width: min(44vw, 460px); aspect-ratio: 1; margin: auto; }
-  .radial .core { position: absolute; inset: 30%; border-radius: 50%; display: grid; place-items: center; text-align: center; padding: 1rem; background: radial-gradient(circle, rgba(236,72,153,0.4), rgba(9,9,11,0.9)); border: 1px solid var(--line); box-shadow: 0 0 60px rgba(236,72,153,0.4); font-weight: 800; font-size: 1rem; color: #fff; animation: pulse 3s ease-in-out infinite; }
-  @keyframes pulse { 50% { box-shadow: 0 0 90px rgba(249,115,22,0.5); } }
-  .radial .ring { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.15); animation: spin 40s linear infinite reverse; }
-  .radial .ring::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 70%, rgba(249,115,22,0.6) 80%, transparent 90%); -webkit-mask: radial-gradient(circle, transparent 98%, #000 100%); mask: radial-gradient(circle, transparent 98%, #000 100%); }
-  .node-r { position: absolute; width: 170px; transform: translate(-50%, -50%); padding: 1rem; border-radius: 18px; background: rgba(9,9,11,0.85); border: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); text-align: left; transition: transform 0.3s, border-color 0.3s; backdrop-filter: blur(10px); }
-  .node-r:hover { transform: translate(-50%, -50%) scale(1.05); border-color: var(--b); z-index: 10; }
-  .node-r b { display: block; color: #fff; font-size: 0.95rem; margin-bottom: 0.3rem; }
-  .eval-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: center; }
-
-  .team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-  .step { display: flex; align-items: center; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap; }
-  .step .s { padding: 0.8rem 1.2rem; border-radius: 16px; background: var(--card); border: 1px solid var(--line); font-size: 0.95rem; color: #fff; font-weight: 700; }
-  .step .s small { display: block; color: var(--muted); font-weight: 600; font-size: 0.75rem; }
-
-  .closing { text-align: center; align-items: center; justify-content: center; }
-  .closing p { max-width: 900px; margin: 0 auto; }
-  .big { font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 900; line-height: 1.15; max-width: 1000px; margin: 0 auto 1.4rem; }
-
-  .hero-text { max-width: 60%; position: relative; z-index: 10; }
+  .section.visible .tl div:nth-child(2) { transition-delay: 0.3s; background: linear-gradient(90deg, var(--a), var(--d)); }
+  .section.visible .tl div:nth-child(3) { transition-delay: 0.6s; background: linear-gradient(90deg, var(--d), var(--e)); }
+  .tl div small { display: block; font-weight: 600; font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 4px; }
 
   /* Responsive Design */
   @media (max-width: 1024px) {
@@ -190,40 +178,40 @@
     .section { padding: 10vh 6vw; }
     .orb { width: min(34vw, 300px); right: 3vw; opacity: 0.35; }
     .hero-text { max-width: 80%; }
-    .radial { width: min(46vw, 380px); }
   }
 
   @media (max-width: 900px) {
-    .grid3, .grid4, .team, .alt, .eval-wrap, .grid2 { grid-template-columns: 1fr; }
+    .grid3, .grid4, .alt, .grid2 { grid-template-columns: 1fr; }
     .orb { opacity: 0.12; }
     .hero-text { max-width: 100%; }
     .arrow { display: none; }
-    .flow { flex-direction: column; gap: 0.8rem; }
-    .node { min-width: 0; width: 100%; }
+    .flow { flex-direction: column; gap: 1rem; }
+    .node { width: 100%; }
     .tl { flex-direction: column; }
-    .radial { width: min(80vw, 380px); margin-bottom: 2rem; }
-    .eval-wrap { grid-template-columns: 1fr; }
+    .card:hover { transform: none; } /* Desactivar 3D en tablets/móviles para mejor usabilidad */
   }
 
   @media (max-width: 600px) {
-    .orb, .radial { display: none; }
+    .orb { display: none; }
     .section { padding: 12vh 6vw; }
-    h1 { font-size: 2.4rem; }
-    h2 { font-size: 1.9rem; margin-bottom: 1rem; }
-    .q { font-size: 1.4rem; padding: 1.6rem 1.4rem; }
-    .q::before { font-size: 4rem; top: -15px; left: 10px; }
-    .layer { flex-direction: column; align-items: flex-start; padding: 1.2rem; }
-    .step { flex-direction: column; align-items: stretch; text-align: center; }
-    .step .s { width: 100%; }
-    .big { font-size: 1.9rem; }
-    .glow-pointer { display: none; } /* Ocultar luz en celulares por rendimiento */
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .q { font-size: 1.3rem; padding: 2rem 1.4rem; }
+    .layer { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-<div class="glow-pointer" id="glow"></div>
 
+<!-- Fondo Animado -->
+<div class="aurora-bg">
+  <div class="aurora-blob blob-1"></div>
+  <div class="aurora-blob blob-2"></div>
+  <div class="aurora-blob blob-3"></div>
+</div>
+<div class="grid-bg"></div>
+
+<!-- Barra Progreso -->
 <div class="bar-bg">
   <div class="bar" id="bar"></div>
 </div>
@@ -232,32 +220,19 @@
 
   <!-- 0. PORTADA -->
   <section class="section">
-    <div class="orb float" aria-hidden="true">
-      <svg viewBox="0 0 400 400">
-        <defs>
-          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#ec4899"/>
-            <stop offset="1" stop-color="#f97316"/>
-          </linearGradient>
-        </defs>
-        <circle cx="200" cy="200" r="180" fill="none" stroke="url(#g1)" stroke-width="3" stroke-dasharray="8 12"/>
-        <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
-        <circle cx="200" cy="200" r="85" fill="url(#g1)" opacity=".2"/>
-        <circle cx="200" cy="20" r="14" fill="#f97316"/>
-        <circle cx="380" cy="200" r="10" fill="#10b981"/>
-        <circle cx="200" cy="330" r="12" fill="#8b5cf6"/>
-        <circle cx="50" cy="150" r="9" fill="#facc15"/>
-        <text x="200" y="212" text-anchor="middle" fill="#fff" font-size="38" font-family="'Plus Jakarta Sans'" font-weight="900">EDUTEC</text>
-      </svg>
+    <div class="orb">
+      <div class="orb-core"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring-2"></div>
     </div>
     <div class="hero-text">
-      <div class="tag reveal"><b>ETP</b> Presentación final del proyecto ABP · Mendoza</div>
+      <div class="tag reveal"><b>ETP</b> Presentación final ABP · Mendoza</div>
       <h1 class="reveal">Continuidad pedagógica <span class="grad">sin aulas vacías</span></h1>
       <p class="reveal" style="margin-top:1.6rem; font-size:1.25rem">Microcapacitaciones de 20 minutos para el Aula EDUTEC (Moodle), pensadas para responder a las contingencias climáticas en la ETP.</p>
       <div class="reveal" style="margin-top:2rem; display:flex; gap:0.8rem; flex-wrap:wrap">
-        <span class="pill">Aprendizaje Basado en Proyectos</span>
-        <span class="pill">Práctica II</span>
-        <span class="pill">Co-enseñanza</span>
+        <span class="pill"><i data-lucide="brain-circuit" style="width:16px"></i> Aprendizaje Basado en Proyectos</span>
+        <span class="pill"><i data-lucide="flask-conical" style="width:16px"></i> Práctica II</span>
+        <span class="pill"><i data-lucide="users" style="width:16px"></i> Co-enseñanza</span>
       </div>
     </div>
   </section>
@@ -267,30 +242,32 @@
     <div class="tag reveal"><b>01</b> El problema</div>
     <h2 class="reveal">¿Qué situación <span class="grad">decidimos abordar?</span></h2>
     <p class="reveal" style="max-width:820px">Viento Zonda y temporales interrumpen las clases presenciales en la ETP. Frente a ello, el EVEA (Moodle / Aula EDUTEC) aparece como recurso, pero su apropiación docente es desigual.</p>
+    
     <div class="flow reveal">
-      <div class="node"><div class="n"><i class="ph ph-buildings"></i></div><h3>Clase presencial</h3><p>Planificación habitual</p></div>
+      <div class="node"><div class="n"><i data-lucide="school"></i></div><h3>Clase presencial</h3><p>Planificación habitual</p></div>
       <div class="arrow"></div>
-      <div class="node" style="border-color:rgba(236,72,153,.5)"><div class="n" style="color:var(--a)"><i class="ph ph-wind"></i></div><h3>Contingencia</h3><p>Viento Zonda / temporal</p></div>
+      <div class="node" style="border-color:rgba(236,72,153,.5)"><div class="n" style="color:var(--a); background:rgba(236,72,153,.1)"><i data-lucide="wind"></i></div><h3>Contingencia</h3><p>Viento Zonda / temporal</p></div>
       <div class="arrow"></div>
-      <div class="node"><div class="n"><i class="ph ph-lightning"></i></div><h3>Emergencia</h3><p>Improvisada, sin criterio común</p></div>
+      <div class="node"><div class="n" style="color:var(--d); background:rgba(249,115,22,.1)"><i data-lucide="zap"></i></div><h3>Emergencia</h3><p>Improvisada, sin criterio</p></div>
     </div>
+
     <div class="grid3" style="margin-top:1.2rem">
       <div class="card reveal"><h3>Uso acrítico de IA</h3><p>Materiales con errores conceptuales sin revisión.</p></div>
       <div class="card reveal"><h3>Saturación</h3><p>Actividades que no se ajustan al grupo ni al taller.</p></div>
       <div class="card reveal"><h3>Sin criterio común</h3><p>Escaso vínculo entre entorno virtual y Perfil Profesional.</p></div>
     </div>
-    <p class="reveal" style="margin-top:1.5rem; color:#fff; font-size: 1.1rem"><b>Desafío:</b> transformar la respuesta de emergencia en una práctica pedagógica planificada y situada.</p>
   </section>
 
   <!-- 2. PREGUNTA GUÍA -->
   <section class="section">
     <div class="tag reveal"><b>02</b> La pregunta guía</div>
-    <div class="q reveal" style="margin:1rem 0 2.5rem">¿Cómo podríamos involucrar las tecnologías y los entornos virtuales (Aula EDUTEC) en las prácticas pedagógicas de la ETP de forma <span class="grad">responsable, situada y transversal</span> frente a contingencias climáticas no presenciales?</div>
+    <div class="q reveal" style="margin:1rem 0 2.5rem">¿Cómo podríamos involucrar las tecnologías y los entornos virtuales en las prácticas pedagógicas de la ETP de forma <span class="grad">responsable, situada y transversal?</span></div>
+    
     <div class="grid4">
-      <div class="card reveal"><div class="ico" style="background:var(--a)"><i class="ph ph-globe-hemisphere-west"></i></div><h3>Parte de la realidad</h3><p>Una problemática real de la provincia.</p></div>
-      <div class="card reveal"><div class="ico" style="background:var(--b)"><i class="ph ph-books"></i></div><h3>Demanda indagar</h3><p>Guió el análisis normativo y pedagógico.</p></div>
-      <div class="card reveal"><div class="ico" style="background:var(--e)"><i class="ph ph-scales"></i></div><h3>Impulsa decisiones</h3><p>Analizar el contexto sociotécnico escolar.</p></div>
-      <div class="card reveal"><div class="ico" style="background:var(--c)"><i class="ph ph-wrench"></i></div><h3>Lleva a solución</h3><p>Una intervención formativa y viable.</p></div>
+      <div class="card reveal"><div class="ico" style="background:linear-gradient(135deg,var(--c),var(--b))"><i data-lucide="globe"></i></div><h3>Realidad</h3><p>Una problemática real de la provincia.</p></div>
+      <div class="card reveal"><div class="ico" style="background:linear-gradient(135deg,var(--b),var(--a))"><i data-lucide="book-open"></i></div><h3>Indagación</h3><p>Guió el análisis normativo y pedagógico.</p></div>
+      <div class="card reveal"><div class="ico" style="background:linear-gradient(135deg,var(--a),var(--d))"><i data-lucide="scale"></i></div><h3>Decisiones</h3><p>Analizar el contexto sociotécnico escolar.</p></div>
+      <div class="card reveal"><div class="ico" style="background:linear-gradient(135deg,var(--d),var(--e))"><i data-lucide="wrench"></i></div><h3>Solución</h3><p>Una intervención formativa y viable.</p></div>
     </div>
   </section>
 
@@ -299,13 +276,12 @@
     <div class="tag reveal"><b>03</b> La investigación</div>
     <h2 class="reveal">¿Qué descubrimos? <span class="grad">Fuentes oficiales</span></h2>
     <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-      <div class="card src reveal"><span class="num">01</span><h3>Res. DGE 6231/2026</h3><p>Continuidad no presencial: propósito claro, conectividad, evitar sobrecargas y evaluación formativa.</p></div>
-      <div class="card src reveal"><span class="num">02</span><h3>DCP Mendoza · Capacidades</h3><p>La tecnología es vehículo para resolución de problemas y pensamiento crítico, no adiestramiento instrumental.</p></div>
-      <div class="card src reveal"><span class="num">03</span><h3>DCP · Ciudadanía digital</h3><p>Ética digital, privacidad, convivencia en entornos virtuales y huella digital.</p></div>
-      <div class="card src reveal"><span class="num">04</span><h3>Ley 9.611 · Res. 201/18</h3><p>Regulación pedagógica acordada en Acuerdos Institucionales de Convivencia (AIC).</p></div>
-      <div class="card src reveal"><span class="num">05</span><h3>Guía de convivencia</h3><p>Protocolos institucionales para prevenir conflictos en entornos virtuales.</p></div>
+      <div class="card src reveal"><span class="num">01</span><h3>Res. DGE 6231</h3><p>Continuidad no presencial: propósito claro, conectividad, evitar sobrecargas.</p></div>
+      <div class="card src reveal"><span class="num">02</span><h3>DCP Capacidades</h3><p>La tecnología es vehículo para resolución de problemas, no adiestramiento.</p></div>
+      <div class="card src reveal"><span class="num">03</span><h3>DCP Ciudadanía</h3><p>Ética digital, privacidad y convivencia en entornos virtuales.</p></div>
+      <div class="card src reveal"><span class="num">04</span><h3>Ley 9.611</h3><p>Regulación pedagógica acordada en Acuerdos de Convivencia (AIC).</p></div>
     </div>
-    <div class="discover reveal"><b style="color:var(--e)">Conclusión del diagnóstico:</b> <span style="color:#fff">hay regulaciones y plataformas, pero prevalece el desconocimiento del potencial transversal, y el tiempo es escaso: se necesitan formatos ágiles.</span></div>
+    <div class="discover reveal"><b style="color:var(--c)">Conclusión del diagnóstico:</b> <span style="color:#fff">hay regulaciones y plataformas, pero prevalece el desconocimiento del potencial transversal, y el tiempo es escaso.</span></div>
   </section>
 
   <!-- 4. DECISIONES -->
@@ -314,26 +290,24 @@
     <h2 class="reveal">Tres alternativas, <span class="grad">una elegida</span></h2>
     <div class="alt">
       <div class="card reveal">
-        <span class="pill" style="color:var(--d); border-color:var(--d)">Descartada</span>
-        <h3 style="margin-top:1rem">Cursos asincrónicos o PDF</h3>
-        <p>Instructivos largos y manuales.</p>
+        <span class="pill" style="color:var(--muted)"><i data-lucide="x-circle" style="width:14px"></i> Descartada</span>
+        <h3 style="margin-top:1.5rem">Cursos asincrónicos</h3>
         <div class="meter"><span style="--w:30%"></span></div>
-        <p><b style="color:#fff">Motivo:</b> suelen no leerse por sobrecarga y no resuelven dudas prácticas en tiempo real.</p>
+        <p><b style="color:#fff">Motivo:</b> suelen no leerse por sobrecarga y no resuelven dudas en tiempo real.</p>
       </div>
       <div class="card reveal">
-        <span class="pill" style="color:var(--d); border-color:var(--d)">Descartada</span>
-        <h3 style="margin-top:1rem">Jornadas extensas</h3>
-        <p>Capacitaciones largas y dispersas.</p>
+        <span class="pill" style="color:var(--muted)"><i data-lucide="x-circle" style="width:14px"></i> Descartada</span>
+        <h3 style="margin-top:1.5rem">Jornadas extensas</h3>
         <div class="meter"><span style="--w:45%"></span></div>
-        <p><b style="color:#fff">Motivo:</b> difícil convocar a docentes de distintas áreas técnicas fuera de horario.</p>
+        <p><b style="color:#fff">Motivo:</b> difícil convocar a docentes de distintas áreas fuera de horario.</p>
       </div>
       <div class="card sel reveal">
-        <span class="pill" style="color:var(--c); border-color:var(--c)"><i class="ph ph-check-circle" style="vertical-align:middle; margin-right:4px"></i>Seleccionada</span>
-        <h3 style="margin-top:1rem; font-size:1.4rem">Microcapacitaciones de 20 minutos entre pares</h3>
+        <span class="pill" style="color:var(--e); background:rgba(16,185,129,0.1); border-color:var(--e)"><i data-lucide="check-circle" style="width:16px"></i> Seleccionada</span>
+        <h3 style="margin-top:1.5rem; font-size:1.4rem; color:var(--e)">Microcapacitaciones 20 min</h3>
         <p style="margin-top:0.5rem">"Cápsulas vivas" dentro de los tiempos escolares (reuniones, jornadas).</p>
         <ul style="margin-top:1rem; padding-left:1.2rem; color:#fff">
-          <li style="margin-bottom:0.4rem; color:#fff">Aprender haciendo: el docente resuelve un problema puntual.</li>
-          <li style="color:#fff">Se realiza antes de la próxima eventualidad climática.</li>
+          <li style="margin-bottom:0.4rem">Aprender haciendo: resolver un problema puntual.</li>
+          <li>Se realiza antes de la próxima contingencia.</li>
         </ul>
       </div>
     </div>
@@ -345,13 +319,13 @@
     <h2 class="reveal">Ciclo de Microcapacitaciones <span class="grad">"Aula EDUTEC"</span></h2>
     <div class="stack">
       <div class="layer reveal">
-        <div class="ico" style="background:linear-gradient(135deg,var(--a),var(--b))"><i class="ph ph-timer"></i></div>
+        <div class="ico" style="background:linear-gradient(135deg,var(--a),var(--b))"><i data-lucide="timer"></i></div>
         <div style="flex:1">
           <h3>Estructura de cada cápsula (20 min)</h3>
           <div class="tl">
             <div style="flex:1">0–5 min<small>Activación: caso simulado (Zonda)</small></div>
-            <div style="flex:2;background:linear-gradient(90deg,var(--b),var(--c))">5–15 min<small>Manos a la obra: Módulos 1 a 3</small></div>
-            <div style="flex:1;background:linear-gradient(90deg,var(--c),var(--e))">15–20 min<small>Cierre y herramientas</small></div>
+            <div style="flex:2">5–15 min<small>Manos a la obra: Módulos 1 a 3</small></div>
+            <div style="flex:1">15–20 min<small>Cierre y herramientas</small></div>
           </div>
           <div class="sections">
             <span>M1 · Ingresar</span><span>M2 · Matricular</span><span>M3 · Cargar actividad</span>
@@ -359,128 +333,102 @@
         </div>
       </div>
       <div class="layer reveal">
-        <div class="ico" style="background:linear-gradient(135deg,var(--c),var(--b))"><i class="ph ph-toolbox"></i></div>
+        <div class="ico" style="background:linear-gradient(135deg,var(--b),var(--c))"><i data-lucide="briefcase"></i></div>
         <div>
           <h3>Caja de herramientas</h3>
-          <p>Puesta en común del resultado inmediato, ficha resumen visual plastificada de 1 página y enlace al aula modelo en EDUTEC para replicar.</p>
+          <p>Puesta en común, ficha resumen visual de 1 página y enlace al aula modelo en EDUTEC para replicar.</p>
         </div>
       </div>
       <div class="layer reveal">
-        <div class="ico" style="background:linear-gradient(135deg,var(--e),var(--d))"><i class="ph ph-package"></i></div>
+        <div class="ico" style="background:linear-gradient(135deg,var(--c),var(--e))"><i data-lucide="package-open"></i></div>
         <div>
           <h3>Kit de soporte</h3>
-          <p>Secuencias didácticas modelo listas para importar en Moodle y una lista de verificación en 3 pasos: accesibilidad, no saturación y vinculación técnica.</p>
+          <p>Secuencias didácticas modelo listas para importar en Moodle y checklist: accesibilidad y no saturación.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 6. EVALUACIÓN -->
-  <section class="section">
-    <div class="tag reveal"><b>06</b> La evaluación</div>
-    <h2 class="reveal">¿Cómo sabremos si <span class="grad">resuelve el problema?</span></h2>
-    <div class="eval-wrap">
-      <div class="radial reveal">
-        <div class="ring"></div>
-        <div class="core">Continuidad pedagógica real</div>
-        <div class="node-r" style="left:50%;top:0"><b>⚡ Desempeño</b>100% configura en el espacio de prueba.</div>
-        <div class="node-r" style="left:100%;top:50%"><b>📈 Monitoreo</b>Aulas activas el primer día de suspensión.</div>
-        <div class="node-r" style="left:50%;top:100%"><b>🔍 Calidad</b>Consignas sin errores de IA.</div>
-        <div class="node-r" style="left:0;top:50%"><b>📱 Percepción</b>Encuesta QR al cerrar el taller.</div>
-      </div>
-      <div class="stack">
-        <div class="card reveal"><h3>Evidencia de desempeño inmediato</h3><p>Comprobación en vivo de que cada docente logró configurar su actividad en 20 min.</p></div>
-        <div class="card reveal"><h3>Monitoreo en contingencias</h3><p>Registro de actividad en EDUTEC durante el primer día de suspensión por Zonda.</p></div>
-        <div class="card reveal"><h3>Calidad de las producciones</h3><p>Revisión muestral: enfoque de capacidades y respeto por baja conectividad.</p></div>
-        <div class="card reveal"><h3>Sondeo de autopercepción</h3><p>Claridad del taller y confianza adquirida para usar la plataforma.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. EQUIPO -->
-  <section class="section">
-    <div class="tag reveal"><b>07</b> El equipo pedagógico</div>
-    <h2 class="reveal">Roles, decisiones y <span class="grad">aprendizajes</span></h2>
-    <div class="team">
-      <div class="card reveal"><div class="ico" style="background:var(--a)"><i class="ph ph-magnifying-glass"></i></div><h3>Análisis normativo</h3><p>DGE, leyes y resoluciones provinciales.</p></div>
-      <div class="card reveal"><div class="ico" style="background:var(--b)"><i class="ph ph-compass"></i></div><h3>Diseño técnico</h3><p>Secuencias en Moodle / EDUTEC.</p></div>
-      <div class="card reveal"><div class="ico" style="background:var(--c)"><i class="ph ph-clock"></i></div><h3>Dinámica 20 min</h3><p>Tiempos estrictos y recursos interactivos.</p></div>
-    </div>
-    <div class="grid2" style="margin-top:1.2rem">
-      <div class="card reveal"><h3>🗣️ Toma de decisiones</h3><p>El cansancio docente y la urgencia ante avisos de Zonda llevaron a condensar el curso tradicional en microtalleres de alto impacto.</p></div>
-      <div class="card reveal"><h3>🌱 Aprendizajes</h3><p>Capacitar a colegas es crear espacios accesibles donde experimentar y construir soluciones para la escuela técnica.</p></div>
-    </div>
-    <div class="step reveal">
-      <div class="s">Análisis normativo<small>investigación</small></div> <i class="ph ph-arrow-right" style="color:var(--muted)"></i>
-      <div class="s">Debate pedagógico<small>deliberación</small></div> <i class="ph ph-arrow-right" style="color:var(--muted)"></i>
-      <div class="s">Microtaller 20 min<small>decisión colectiva</small></div> <i class="ph ph-arrow-right" style="color:var(--muted)"></i>
-      <div class="s">Kit y aula modelo<small>producto</small></div>
-    </div>
-  </section>
-
-  <!-- 8. CIERRE -->
+  <!-- 6. CIERRE -->
   <section class="section closing" style="min-height: 80vh">
     <div class="tag reveal" style="justify-content:center"><b>✦</b> Mensaje final</div>
     <div class="big reveal">La integración tecnológica exige co-enseñanza: <span class="grad">se construye en colectivo.</span></div>
-    <p class="reveal" style="font-size: 1.3rem">Continuidad pedagógica con sentido, sin sobrecargar ni excluir a nuestra comunidad.</p>
+    <p class="reveal" style="font-size: 1.3rem">Continuidad pedagógica con sentido, sin sobrecargar a nuestra comunidad.</p>
     
-    <div class="grid3 reveal" style="margin-top:3rem; max-width:900px; margin-left:auto; margin-right:auto; text-align: left;">
-      <div class="card"><h3>Microcapacitación</h3><p>20 minutos, aprender haciendo</p></div>
-      <div class="card"><h3>Aula Modelo</h3><p>Referencia para replicar</p></div>
-      <div class="card"><h3>Kit de soporte</h3><p>Secuencias y checklist</p></div>
+    <div class="grid3 reveal" style="margin-top:4rem; max-width:900px; margin-left:auto; margin-right:auto; text-align: left;">
+      <div class="card" style="text-align: center">
+        <i data-lucide="rocket" style="width:40px;height:40px;color:var(--c);margin-bottom:1rem"></i>
+        <h3>Microcapacitación</h3><p>20 minutos, aprender haciendo</p>
+      </div>
+      <div class="card" style="text-align: center">
+        <i data-lucide="copy" style="width:40px;height:40px;color:var(--a);margin-bottom:1rem"></i>
+        <h3>Aula Modelo</h3><p>Referencia para replicar</p>
+      </div>
+      <div class="card" style="text-align: center">
+        <i data-lucide="check-square" style="width:40px;height:40px;color:var(--e);margin-bottom:1rem"></i>
+        <h3>Kit de soporte</h3><p>Secuencias y checklist</p>
+      </div>
     </div>
-    
-    <p class="reveal" style="margin-top:4rem; font-size:1.1rem; color:var(--b); font-weight:700">¡Gracias! · Preguntas y comentarios</p>
   </section>
 
 </div>
 
 <script>
-  // 1. Lógica del Intersection Observer (Animaciones al hacer scroll)
-  const sections = document.querySelectorAll('.section');
-  
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.2 // Se activa cuando el 20% de la sección es visible
-  };
+  // Inicializar Iconos Lucide
+  lucide.createIcons();
 
-  const sectionObserver = new IntersectionObserver((entries, observer) => {
+  // 1. Observer para animación de Scroll Reveal 3D
+  const sections = document.querySelectorAll('.section');
+  const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+
+  const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('visible');
     });
   }, observerOptions);
 
-  sections.forEach(section => {
-    sectionObserver.observe(section);
-  });
+  sections.forEach(section => sectionObserver.observe(section));
 
-  // 2. Halo de luz dinámico que sigue al cursor
-  const glow = document.getElementById('glow');
+  // 2. Efecto 3D Interactivo para las Tarjetas (Parallax en Hover)
+  const cards = document.querySelectorAll('.card');
   
-  document.addEventListener('mousemove', (e) => {
-    // Solo mostrar el glow si el ratón se mueve
-    glow.style.opacity = '1';
-    // Mover el elemento a la posición exacta del cursor
-    glow.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      // Evitar el efecto en pantallas pequeñas por rendimiento y UX
+      if(window.innerWidth < 900) return; 
+
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // Pasar coordenadas para el brillo dinámico interior (hover radial gradient)
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+
+      // Calcular la rotación 3D
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -8; // Inclinación vertical máx 8 grados
+      const rotateY = ((x - centerX) / centerX) * 8;  // Inclinación horizontal máx 8 grados
+
+      // Desactivar transición CSS para que siga al ratón de forma instantánea
+      card.style.transition = 'none';
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      // Reactivar la transición suave al sacar el ratón
+      card.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s, border-color 0.5s';
+      card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+    });
   });
 
-  // Ocultar el glow cuando el ratón sale de la ventana
-  document.addEventListener('mouseleave', () => {
-    glow.style.opacity = '0';
-  });
-
-  // 3. Barra de progreso de lectura (Scroll superior)
+  // 3. Barra superior de Progreso
   const progressBar = document.getElementById('bar');
-  
   window.addEventListener('scroll', () => {
     const scrollTop = window.scrollY;
     const docHeight = document.body.scrollHeight - window.innerHeight;
-    const scrollPercent = (scrollTop / docHeight) * 100;
-    
-    progressBar.style.width = scrollPercent + '%';
+    progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
   });
 </script>
 </body>
